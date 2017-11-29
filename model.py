@@ -93,33 +93,14 @@ def affine_forward(X, W, out_sz):
     return V, out
 
 class Model:
-	layer_type_map = {
-        'fc_layer': FullyConnectedLayer,
-        'final_layer': ClassifyLayer,
-        'conv_layer': ConvLayer,
-        'pool_layer': PoolingLayer
-    }
 
-    def __init__(self, W, layer_config):
+    def __init__(self, W, layers):
 
     	self.W = W
+        self.layers = layers
         self.layer_cache = []
-    	self.setup_layers(layer_config)
-    	self.layer_weight_shapes = [l.weights.shape for l in self.layers if not isinstance(l,PoolingLayer)]
-        self.layer_biases_shapes = [l.biases.shape for l in self.layers if not isinstance(l,PoolingLayer)]
-
-    def initialize_layers(self, layer_config):
-    	layer_inputs = []
-    	W = self.W
-    	for layer_type in layer_config:
-    		# handle the spec format: {'type': {kwargs}}
-    		layer_class = self.layer_type_map[layer_type.keys()[0]]
-    		layer_kwargs = layer_type.values()[0]
-    		# input shape to new layer is outpot shape of last layer
-    		layer = layer_class(W, **layer_kwargs)
-    		W = layer.output.shape 
-    		layers.append(layer)
-    	self.layers = layers
+    	self.layer_weight_shapes = []
+        self.layer_biases_shapes = []
 
     def feedforward(self, image):
         prev_out = image
@@ -136,7 +117,7 @@ class Model:
                 for i in range(weights.shape[0]):
                     plt.imsave('images/filter_conv%s.jpg'%i, weights[i].reshape((5,5)))
             elif layer == "pool":
-                indxs, out = max_pool_forward(X, W, 2, 2)
+                V, out = max_pool_forward(X, W, 2, 2)
                 for i in range(out.shape[0]):
                     plt.imsave('images/pool_pic%s.jpg'%i, out[i])
             elif layer == "fc":
@@ -148,6 +129,7 @@ class Model:
             else:
                 raise NotImplementedError
 
+            layer_cache.append(V)
             prev_out = out
 
         final_activation = prev_activation
@@ -155,7 +137,6 @@ class Model:
 
     def backpropagate(self, image, label):
         
-
 
 
 
