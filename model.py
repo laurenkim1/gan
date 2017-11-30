@@ -3,8 +3,9 @@ import numpy as np
 import random
 import math
 import time
-import feedforward as f 
-import backprop as b 
+from feedforward import * 
+from backprop import *
+from im2col import *
 
 def L2_regularize(reg, weights):
     return 0.5*reg*np.sum(weights**2)
@@ -19,10 +20,10 @@ def softmax_loss(x, y):
     dx /= N
     return loss, dx
 
-class Model:
+class CNN:
 
-    def __init__(self, input_dim=(3, 32, 32), num_filters=32, filter_size=7,
-                 hidden_dim=100, num_classes=2, weight_scale=1e-3, reg=0.0,
+    def __init__(self, input_dim=(3, 32, 32), num_filters=28, filter_size=7,
+                 hidden_dim=100, num_classes=10, weight_scale=1e-3, reg=0.0,
                  dtype=np.float32):
         self.params = {}
         self.reg = reg
@@ -36,13 +37,13 @@ class Model:
         D, H, W = input_dim
         # conv layer
         self.params['W1'] = np.random.normal(0, weight_scale, (self.K, D, self.F, self.F))
-        self.params['b1'] = np.zeros(K)
+        self.params['b1'] = np.zeros(self.K)
         # pool layer
         conv_h = (H - self.F + 2*self.P)/self.S + 1
         conv_w = (W - self.F + 2*self.P)/self.S + 1
 
-        pool_h = (conv_h - self.F) / self.S + 1
-        pool_w = (conv_w - self.F) / self.S + 1
+        pool_h = conv_h/2#(conv_h - self.F) / 2 + 1
+        pool_w = conv_w/2#(conv_w - self.F) / 2 + 1
         # hidden affine layer
         self.params['W2'] = np.random.normal(0, weight_scale, (self.K*pool_h*pool_w, hidden_dim))
         self.params['b2'] = np.zeros(hidden_dim)
@@ -63,10 +64,10 @@ class Model:
 
         # feed forward
 
-        conv_cache, conv_out = conv_forward_im2col(X, W1, b1, self.F, self.S, self.K, self.P)
+        conv_cache, conv_out = conv_forward(X, W1, b1, self.F, self.S, self.K, self.P)
         relu1_cache, relu1_out = relu_forward(conv_out)
 
-        pool_cache, pool_out = max_pool_forward_fast(relu1_out, 2, 2)
+        pool_cache, pool_out = max_pool_forward(relu1_out, 2, 2)
 
         affine1_cache, affine1_out = affine_forward(pool_out, W2, b2)
         relu2_cache, relu2_out = relu_forward(affine1_out)
@@ -96,10 +97,10 @@ class Model:
         grads['W2'] = affine1_dw + self.reg * self.params['W2']
         grads['b2'] = affine1_db
 
-        pool_dx = max_pool_backward_fast(affine1_dx, pool_cache)
-        relu1_dx = relu_backward(pool_dx, relu1_cache)
+        pool_dx = bp_pool(affine1_dx, pool_cache)
+        relu1_dx = bp_relu(pool_dx, relu1_cache)
 
-        conv_dx, conv_dw, conv_db = conv_backward_im2col(relu1_dx, conv_cache)
+        conv_dx, conv_dw, conv_db = bp_conv(relu1_dx, conv_cache)
         grads['W1'] = conv_dw + self.reg * self.params['W1']
         grads['b1'] = conv_db
 
