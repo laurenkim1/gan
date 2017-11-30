@@ -23,7 +23,7 @@ def softmax_loss(x, y):
 class CNN:
 
     def __init__(self, input_dim=(1, 28, 28), num_filters=32, filter_size=3,
-                 hidden_dim=100, num_classes=10, weight_scale=1e-3, reg=0.0,
+                 hidden_dim=500, num_classes=10, weight_scale=1e-3, reg=1e-3,
                  dtype=np.float32):
         self.params = {}
         self.reg = reg
@@ -42,12 +42,13 @@ class CNN:
         conv_h = (H - self.F + 2*self.P)/self.S + 1
         conv_w = (W - self.F + 2*self.P)/self.S + 1
 
-        pool_h = conv_h/2#(conv_h - self.F) / 2 + 1
-        pool_w = conv_w/2#(conv_w - self.F) / 2 + 1
-        # hidden affine layer
+        pool_sz = 2
+        pool_h = conv_h/pool_sz
+        pool_w = conv_w/pool_sz
+        # hidden fc layer
         self.params['W2'] = np.random.normal(0, weight_scale, (self.K*pool_h*pool_w, hidden_dim))
         self.params['b2'] = np.zeros(hidden_dim)
-        # classifying affine layer
+        # classifying fc layer
         self.params['W3'] = np.random.normal(0, weight_scale, (hidden_dim, num_classes))
         self.params['b3'] = np.zeros(num_classes)
 
@@ -69,11 +70,11 @@ class CNN:
 
         pool_cache, pool_out = max_pool_forward(relu1_out, 2, 2)
 
-        affine1_cache, affine1_out = affine_forward(pool_out, W2, b2)
-        relu2_cache, relu2_out = relu_forward(affine1_out)
+        fc1_cache, fc1_out = fc_forward(pool_out, W2, b2)
+        relu2_cache, relu2_out = relu_forward(fc1_out)
 
-        affine2_cache, affine2_out = affine_forward(relu2_out, W3, b3)
-        scores = affine2_out
+        fc2_cache, fc2_out = fc_forward(relu2_out, W3, b3)
+        scores = fc2_out
 
         if y is None:
           return scores
@@ -87,17 +88,17 @@ class CNN:
         loss += L2_regularize(self.reg, W2)
         loss += L2_regularize(self.reg, W3)
 
-        affine2_dx, affine2_dw, affine2_db = bp_fc(dscores, affine2_cache)
-        grads['W3'] = affine2_dw + self.reg * self.params['W3']
-        grads['b3'] = affine2_db
+        fc2_dx, fc2_dw, fc2_db = bp_fc(dscores, fc2_cache)
+        grads['W3'] = fc2_dw + self.reg * self.params['W3']
+        grads['b3'] = fc2_db
 
-        relu2_dx = bp_relu(affine2_dx, relu2_cache)
+        relu2_dx = bp_relu(fc2_dx, relu2_cache)
 
-        affine1_dx, affine1_dw, affine1_db = bp_fc(relu2_dx, affine1_cache)
-        grads['W2'] = affine1_dw + self.reg * self.params['W2']
-        grads['b2'] = affine1_db
+        fc1_dx, fc1_dw, fc1_db = bp_fc(relu2_dx, fc1_cache)
+        grads['W2'] = fc1_dw + self.reg * self.params['W2']
+        grads['b2'] = fc1_db
 
-        pool_dx = bp_pool(affine1_dx, pool_cache)
+        pool_dx = bp_pool(fc1_dx, pool_cache)
         relu1_dx = bp_relu(pool_dx, relu1_cache)
 
         conv_dx, conv_dw, conv_db = bp_conv(relu1_dx, conv_cache)
