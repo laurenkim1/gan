@@ -77,20 +77,20 @@ class CNN:
         W4, b4 = self.params['W4'], self.params['b4']
 
         # feed forward
-
+        # conv->relu layer 1
         conv1_cache, conv1_out = conv_forward(X, W1, b1, self.F, self.S, self.K, self.P)
         relu1_cache, relu1_out = relu_forward(conv1_out)
-
+        # pool layer 1
         pool1_cache, pool1_out = max_pool_forward(relu1_out, 2, 2)
-
+        # conv->relu layer 2
         conv2_cache, conv2_out = conv_forward(pool1_out, W2, b2, self.F, self.S, 64, self.P)
         relu2_cache, relu2_out = relu_forward(conv2_out)
-
+        # pool layer 2
         pool2_cache, pool2_out = max_pool_forward(relu2_out, 2, 2)
-
+        # FC->relu layer 1
         fc1_cache, fc1_out = fc_forward(pool2_out, W3, b3)
         relu3_cache, relu3_out = relu_forward(fc1_out)
-
+        #FC 2 - classifying layer
         fc2_cache, fc2_out = fc_forward(relu3_out, W4, b4)
         scores = fc2_out
 
@@ -123,8 +123,6 @@ class CNN:
         conv2_dx, conv2_dw, conv2_db = bp_conv(relu2_dx, conv2_cache)
         grads['W2'] = conv2_dw + self.reg * self.params['W2']
         grads['b2'] = conv2_db
-
-        ####
 
         pool1_dx = bp_pool(conv2_dx, pool1_cache)
         relu1_dx = bp_relu(pool1_dx, relu1_cache)
