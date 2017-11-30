@@ -22,7 +22,7 @@ def softmax_loss(x, y):
 
 class CNN:
 
-    def __init__(self, input_dim=(1, 28, 28), num_filters=28, filter_size=7,
+    def __init__(self, input_dim=(1, 28, 28), num_filters=32, filter_size=3,
                  hidden_dim=100, num_classes=10, weight_scale=1e-3, reg=0.0,
                  dtype=np.float32):
         self.params = {}
