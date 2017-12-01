@@ -57,15 +57,12 @@ class generator:
 	    # conv->relu layer 1
 	    conv1_cache, conv1_out = conv_forward(r_relu1_out, W2, b2, self.F, self.S, self.z_dim/2, self.P)
 	    relu2_cache, relu2_out = relu_forward(conv1_out)
-	    print relu2_out.shape
-	    relu2_out.reshape(56, 56)
 	    # conv->relu layer 2
 	    conv2_cache, conv2_out = conv_forward(relu2_out, W3, b3, self.F, self.S, self.z_dim/4, self.P)
-	    relu3_cache, relu3_out = relu_forward(conv3_out)
-	    relu3_out.reshape(56, 56)
+	    relu3_cache, relu3_out = relu_forward(conv2_out)
 	    # conv->sigmoid layer 3
-	    conv3_cache, conv3_out = conv_forward(relu2_out, W4, b4, self.F, self.S, 1, self.P)
-	    sigmoid_cache, sigmoid_out = relu_forward(conv2_out)
+	    conv3_cache, conv3_out = conv_forward(relu3_out, W4, b4, 1, self.S, 1, self.P)
+	    sigmoid_cache, sigmoid_out = relu_forward(conv3_out)
 
 	    image = sigmoid_out
 
