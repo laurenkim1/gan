@@ -53,7 +53,7 @@ class generator:
 			self.params[k] = v.astype(dtype)
 
 
-	def loss(self, X, y=None):
+	def get_new(self, X, y=None):
 		# Evaluate loss and gradient for the three-layer convolutional network.
 		W1, b1 = self.params['W1'], self.params['b1']
 		W2, b2 = self.params['W2'], self.params['b2']
@@ -78,7 +78,7 @@ class generator:
 		sigmoid_cache, sigmoid_out = relu_forward(conv3_out)
 
 		image = sigmoid_out
-		"""
+
 		if y is None:
 			return image.shape
 		"""
@@ -121,5 +121,5 @@ class generator:
 		grads['b1'] = fc1_db
 
 		return loss, grads
-
+"""
 
