@@ -37,12 +37,17 @@ def adam(x, dx, config=None):
 
     next_x = None
 
-    config['t']+=1 
-    config['m'] = config['beta1']*config['m'] + (1- config['beta1'])*dx
-    config['v'] = config['beta2']*config['v'] + (1- config['beta2'])*(dx**2)   
-    mb = config['m']/(1-config['beta1']**config['t'])
-    vb = config['v']/(1-config['beta2']**config['t'])
-    next_x = x -config['learning_rate']* mb / (np.sqrt(vb) + config['epsilon'])
+    # keeps an exponentially decaying average of past gradients m, similar to momentum
+    # m and v are estimates of the first moment (the mean) and the second moment (the uncentered variance) of the gradients respectively
+
+    config['t'] += 1 
+    config['m'] = config['beta1']*config['m'] + (1 - config['beta1'])*dx
+    config['v'] = config['beta2']*config['v'] + (1 - config['beta2'])*(dx**2)   
+
+    # counteract initial biases toward 0 by computing bias-corrected first and second moment estimates:
+    bcm = config['m']/(1-config['beta1']**config['t'])
+    bcv = config['v']/(1-config['beta2']**config['t'])
+    next_x = x - (config['learning_rate']/(np.sqrt(bcv) + config['epsilon']))*bcm 
 
     return next_x, config
 
