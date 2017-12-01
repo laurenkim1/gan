@@ -68,8 +68,6 @@ class generator:
 
 	    if y is None:
 	    	return image.shape
-
-"""
         
         loss, grads = 0, {}
 
@@ -107,5 +105,4 @@ class generator:
 
         return loss, grads
 
-"""
 
