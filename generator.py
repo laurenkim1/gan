@@ -21,8 +21,8 @@ class generator:
 		self.P = 1
 
 		# FC 1
-		self.params['W1'] = np.random.normal(0, weight_scale, (self.z_dim, 3136))
-		self.params['b1'] = np.zeros(3136)
+		self.params['W1'] = np.random.normal(0, weight_scale, (self.z_dim, 3249))
+		self.params['b1'] = np.zeros(3249)
 
 		# conv layer 1: generate 50 features
 		self.params['W2'] = np.random.normal(0, weight_scale, (self.z_dim/2, 1, 3, 3))
@@ -33,7 +33,7 @@ class generator:
 		self.params['b3'] = np.zeros(self.z_dim/4)
 
 		# conv layer 3: final convolution with one output channel
-		self.params['W4'] = np.random.normal(0, weight_scale, (1, self.z_dim/4, 1, 1))
+		self.params['W4'] = np.random.normal(0, weight_scale, (1, self.z_dim/4, 3, 3))
 		self.params['b4'] = np.zeros(1)
 
 		for k, v in self.params.iteritems():
@@ -52,7 +52,7 @@ class generator:
 	    # fc layer 1
 	    fc_cache, fc_out = fc_forward(X, W1, b1)
 	    relu1_cache, relu1_out = relu_forward(fc_out)
-	    r_relu1_out = relu1_out.reshape((-1, 1, 56, 56))
+	    r_relu1_out = relu1_out.reshape((-1, 1, 57, 57))
 
 	    # conv->relu layer 1
 	    conv1_cache, conv1_out = conv_forward(r_relu1_out, W2, b2, self.F, self.S, self.z_dim/2, self.P)
@@ -61,7 +61,7 @@ class generator:
 	    conv2_cache, conv2_out = conv_forward(relu2_out, W3, b3, self.F, self.S, self.z_dim/4, self.P)
 	    relu3_cache, relu3_out = relu_forward(conv2_out)
 	    # conv->sigmoid layer 3
-	    conv3_cache, conv3_out = conv_forward(relu3_out, W4, b4, 1, self.S, 1, self.P)
+	    conv3_cache, conv3_out = conv_forward(relu3_out, W4, b4, self.F, 2, 1, 0)
 	    sigmoid_cache, sigmoid_out = relu_forward(conv3_out)
 
 	    image = sigmoid_out
