@@ -59,7 +59,6 @@ class generator():
         conv3_cache, conv3_out = conv_forward(relu2_out, W4, b4, self.F, self.S, 1, self.P)
         sigmoid_cache, sigmoid_out = relu_forward(conv2_out)
 
-
         image = sigmoid_out
 
         if y is None:
@@ -69,35 +68,35 @@ class generator():
 
         # backpropagation
 
-        loss, dscores = softmax_loss(scores, y)
+        loss, dimage = softmax_loss(image, y)
         loss += L2_regularize(self.reg, W1)
         loss += L2_regularize(self.reg, W2)
         loss += L2_regularize(self.reg, W3)
         loss += L2_regularize(self.reg, W4)
 
-        fc2_dx, fc2_dw, fc2_db = bp_fc(dscores, fc2_cache)
-        grads['W4'] = fc2_dw + self.reg * self.params['W4']
-        grads['b4'] = fc2_db
+        sigmoid_dx = bp_sigmoid(dimage, sigmoid_cache)
 
-        relu3_dx = bp_relu(fc2_dx, relu3_cache)
+        conv3_dx, conv3_dw, conv3_db = bp_conv(sigmoid_dx, conv3_cache)
+        grads['W4'] = conv3_dw + self.reg * self.params['W4']
+        grads['b4'] = conv3_db
 
-        fc1_dx, fc1_dw, fc1_db = bp_fc(relu3_dx, fc1_cache)
-        grads['W3'] = fc1_dw + self.reg * self.params['W3']
-        grads['b3'] = fc1_db
+        relu3_dx = bp_relu(conv3_dx, relu3_cache)
 
-        pool2_dx = bp_pool(fc1_dx, pool2_cache)
-        relu2_dx = bp_relu(pool2_dx, relu2_cache)
+        conv2_dx, conv2_dw, conv2_db = bp_conv(relu3_dx, conv2_cache)
+        grads['W3'] = conv2_dw + self.reg * self.params['W3']
+        grads['b3'] = conv2_db
 
-        conv2_dx, conv2_dw, conv2_db = bp_conv(relu2_dx, conv2_cache)
-        grads['W2'] = conv2_dw + self.reg * self.params['W2']
-        grads['b2'] = conv2_db
+        relu2_dx = bp_relu(conv2_dx, relu2_cache)
 
-        pool1_dx = bp_pool(conv2_dx, pool1_cache)
-        relu1_dx = bp_relu(pool1_dx, relu1_cache)
-
-        conv1_dx, conv1_dw, conv1_db = bp_conv(relu1_dx, conv1_cache)
+        conv1_dx, conv1_dw, conv1_db = bp_conv(relu2_dx, conv1_cache)
         grads['W1'] = conv1_dw + self.reg * self.params['W1']
         grads['b1'] = conv1_db
+
+        relu1_dx = bp_relu(conv1_dx, relu1_cache)
+
+        fc1_dx, fc1_dw, fc1_db = bp_fc(relu1_dx, fc1_cache)
+        grads['W3'] = fc1_dw + self.reg * self.params['W3']
+        grads['b3'] = fc1_db
 
         return loss, grads
 
