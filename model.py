@@ -20,7 +20,7 @@ def softmax_loss(x, y):
     dx /= N
     return loss, dx
 
-class CNN:
+class discriminator:
 
     def __init__(self, input_dim=(1, 28, 28), num_filters=32, filter_size=5,
                  hidden_dim=500, num_classes=10, weight_scale=1e-3, reg=1e-3,

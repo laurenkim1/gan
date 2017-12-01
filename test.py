@@ -57,7 +57,7 @@ small_data = {
   'y_val': data['y_val'][:50],
 }
 
-model = CNN(weight_scale=0.001, hidden_dim=500, reg=0.001)
+model = discriminator(weight_scale=0.001, hidden_dim=500, reg=0.001)
 
 solver = Solver(model, data,
                 num_epochs=1, batch_size=50,
