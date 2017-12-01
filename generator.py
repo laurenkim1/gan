@@ -67,7 +67,7 @@ class generator:
 	    image = sigmoid_out
 
 	    if y is None:
-	    	return image
+	    	return image.shape
 
 """
         
