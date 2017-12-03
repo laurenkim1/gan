@@ -66,5 +66,5 @@ solver = Solver(model, data,
                   'learning_rate': 1e-3,
                 },
                 verbose=True, print_every=20)
-#solver.train()
+solver.train()
 solver.predict(data['X_train'][0], data['y_train'][0])
