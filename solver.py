@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 def sgd(w, dw, config=None):
     """
@@ -289,3 +290,28 @@ class Solver(object):
 
         # At the end of training swap the best params into the model
         self.model.params = self.best_params
+
+    def predict(self, X, y):
+        """
+        Check accuracy of the model on the provided data.
+        Inputs:
+        - X: Array of data, of shape (N, d_1, ..., d_k)
+        - y: Array of labels, of shape (N,)
+        - num_samples: If not None, subsample the data and only test the model
+          on num_samples datapoints.
+        - batch_size: Split X and y into batches of this size to avoid using too
+          much memory.
+        Returns:
+        - acc: Scalar giving the fraction of instances that were correctly
+          classified by the model.
+        """
+
+        # Maybe subsample the data
+        X = X.reshape((1, 1, 28, 28))
+        scores = self.model.loss(X)
+        y_pred = np.argmax(scores, axis=1)
+        X = X.reshape((28,28))
+        plt.title('Label is {label}'.format(label=y_pred))
+        plt.imshow(X, cmap='gray')
+        plt.show()
+
