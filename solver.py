@@ -143,7 +143,7 @@ class Solver(object):
         self.y_val = data['y_val']
 
         # Unpack keyword arguments
-        self.update_rule = kwargs.pop('update_rule', 'sgd')
+        self.update_rule = kwargs.pop('update_rule', 'adam')
         self.optim_config = kwargs.pop('optim_config', {})
         self.lr_decay = kwargs.pop('lr_decay', 0.95)
         self.batch_size = kwargs.pop('batch_size', 100)

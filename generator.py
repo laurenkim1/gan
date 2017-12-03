@@ -53,7 +53,7 @@ class generator:
 			self.params[k] = v.astype(dtype)
 
 
-	def get_new(self, X, y=None):
+	def loss(self, X, y=None):
 		# Evaluate loss and gradient for the three-layer convolutional network.
 		W1, b1 = self.params['W1'], self.params['b1']
 		W2, b2 = self.params['W2'], self.params['b2']
@@ -78,25 +78,25 @@ class generator:
 		sigmoid_cache, sigmoid_out = relu_forward(conv3_out)
 
 		image = sigmoid_out
+		y = np.ones_like(image)
+		y = y.reshape(y.shape[0],-1)
+
+		print y.shape
 
 		if y is None:
 			return image.shape
-		"""
+		
 		loss, grads = 0, {}
-
-		print "a"
 
 		# backpropagation
 
-		loss, dimage = softmax_loss(image, y)
-		print loss
-		print dimage
+		loss, dimage = softmax_loss(image.reshape(image.shape[0], -1), y)
 		loss += L2_regularize(self.reg, W1)
 		loss += L2_regularize(self.reg, W2)
 		loss += L2_regularize(self.reg, W3)
 		loss += L2_regularize(self.reg, W4)
 
-		sigmoid_dx = bp_sigmoid(dimage, sigmoid_cache)
+		sigmoid_dx = bp_relu(dimage, sigmoid_cache)
 
 		conv3_dx, conv3_dw, conv3_db = bp_conv(sigmoid_dx, conv3_cache)
 		grads['W4'] = conv3_dw + self.reg * self.params['W4']
@@ -116,10 +116,10 @@ class generator:
 
 		relu1_dx = bp_relu(conv1_dx, relu1_cache)
 
-		fc1_dx, fc1_dw, fc1_db = bp_fc(relu1_dx, fc1_cache)
+		fc1_dx, fc1_dw, fc1_db = bp_fc(relu1_dx, fc_cache)
 		grads['W1'] = fc1_dw + self.reg * self.params['W1']
 		grads['b1'] = fc1_db
 
 		return loss, grads
-"""
+
 
