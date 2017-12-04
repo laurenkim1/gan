@@ -8,6 +8,10 @@ from solver import *
 from model import *
 from gradient_check import *
 from mnist_loader import *
+from mnist_loader import *
+from sklearn import model_selection
+from sklearn.linear_model import LogisticRegression
+import pickle
 
 def rel_error(x, y):
 	""" returns relative error """
@@ -67,3 +71,7 @@ solver = Solver(model, data,
                 },
                 verbose=True, print_every=20)
 solver.train()
+
+savefile = open('mymodel.pkl', 'wb')
+pickle.dump(model, savefile)
+savefile.close()
