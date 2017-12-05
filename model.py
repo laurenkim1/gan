@@ -20,7 +20,7 @@ def softmax_loss(x, y):
     dx /= N
     return loss, dx
 
-class CNN:
+class discriminator:
 
     def __init__(self, input_dim=(1, 28, 28), num_filters=32, filter_size=5,
                  hidden_dim=500, num_classes=10, weight_scale=1e-3, reg=1e-3,
@@ -36,7 +36,7 @@ class CNN:
 
         D, H, W = input_dim
         # conv layer 1: This finds 32 different 5 x 5 pixel features
-        self.params['W1'] = np.random.normal(0, weight_scale, (self.K, D, self.F, self.F))
+        self.params['W1'] = np.random.randn(self.K, D, self.F, self.F) * weight_scale
         self.params['b1'] = np.zeros(self.K)
         # pool layer 1
         conv1_h = (H - self.F + 2*self.P)/self.S + 1
@@ -47,7 +47,7 @@ class CNN:
         pool1_w = conv1_w/pool1_sz
 
         # conv layer 2: This finds 64 different 5 x 5 pixel features
-        self.params['W2'] = np.random.normal(0, weight_scale, (64, 32, self.F, self.F))
+        self.params['W2'] = np.random.randn(64, 32, self.F, self.F) * weight_scale
         self.params['b2'] = np.zeros(64)
         # pool layer 2
         conv2_h = (pool1_h - self.F + 2*self.P)/self.S + 1
@@ -58,10 +58,10 @@ class CNN:
         pool2_w = conv2_w/pool2_sz
 
         # hidden fc layer
-        self.params['W3'] = np.random.normal(0, weight_scale, (64*pool2_h*pool2_w, hidden_dim))
+        self.params['W3'] = np.random.randn(64*pool2_h*pool2_w, hidden_dim) * weight_scale
         self.params['b3'] = np.zeros(hidden_dim)
         # classifying fc layer
-        self.params['W4'] = np.random.normal(0, weight_scale, (hidden_dim, num_classes))
+        self.params['W4'] = np.random.randn(hidden_dim, num_classes) * weight_scale
         self.params['b4'] = np.zeros(num_classes)
 
         for k, v in self.params.iteritems():
@@ -77,6 +77,7 @@ class CNN:
         W4, b4 = self.params['W4'], self.params['b4']
 
         # feed forward
+
         # conv->relu layer 1
         conv1_cache, conv1_out = conv_forward(X, W1, b1, self.F, self.S, self.K, self.P)
         relu1_cache, relu1_out = relu_forward(conv1_out)
