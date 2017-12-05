@@ -61,6 +61,8 @@ small_data = {
   'y_val': data['y_val'][:50],
 }
 
+#savefile = open('mymodel.pkl', 'rb')
+#model = pickle.load(savefile)
 model = CNN(weight_scale=0.001, hidden_dim=500, reg=0.001)
 
 solver = Solver(model, data,
@@ -72,6 +74,15 @@ solver = Solver(model, data,
                 verbose=True, print_every=20)
 solver.train()
 
-savefile = open('mymodel.pkl', 'wb')
-pickle.dump(model, savefile)
-savefile.close()
+# pickle.dump(model, savefile)
+# savefile.close()
+#savefile.close()
+
+for image in range(len(data['X_train'])):
+  X, y_pred = solver.predict(data['X_train'][image], data['y_train'][image])
+  if y_pred == data['y_train'][image]:
+    plt.title('Label is {label}'.format(label=y_pred))
+    plt.imshow(X, cmap='gray')
+    plt.show()
+
+

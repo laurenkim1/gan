@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 def sgd(w, dw, config=None):
     """
@@ -37,12 +38,16 @@ def adam(x, dx, config=None):
 
     next_x = None
 
+    # keeps an exponentially decaying average of past gradients m, similar to momentum
+    # m and v are estimates of the first moment (the mean) and the second moment (the uncentered variance) of the gradients respectively
+
     config['t']+=1 
     config['m'] = config['beta1']*config['m'] + (1- config['beta1'])*dx
-    config['v'] = config['beta2']*config['v'] + (1- config['beta2'])*(dx**2)   
-    mb = config['m']/(1-config['beta1']**config['t'])
-    vb = config['v']/(1-config['beta2']**config['t'])
-    next_x = x -config['learning_rate']* mb / (np.sqrt(vb) + config['epsilon'])
+    config['v'] = config['beta2']*config['v'] + (1- config['beta2'])*(dx**2)  
+    # counteract initial biases toward 0 by computing bias-corrected first and second moment estimates: 
+    bcm = config['m']/(1-config['beta1']**config['t'])
+    bcv = config['v']/(1-config['beta2']**config['t'])
+    next_x = x - (config['learning_rate']/(np.sqrt(bcv) + config['epsilon']))*bcm 
 
     return next_x, config
 
@@ -284,3 +289,15 @@ class Solver(object):
 
         # At the end of training swap the best params into the model
         self.model.params = self.best_params
+
+    def predict(self, X, y):
+        X = X.reshape((1, 1, 28, 28))
+        scores = self.model.loss(X)
+        y_pred = np.argmax(scores, axis=1)
+        X = X.reshape((28,28))
+        return X, y_pred
+        """
+        plt.title('Label is {label}'.format(label=y_pred))
+        plt.imshow(X, cmap='gray')
+        plt.show()
+        """

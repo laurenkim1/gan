@@ -7,8 +7,6 @@ def bp_conv(delta, cache):
 	K, depth, F, F = W.shape
 
 	db = np.sum(delta, axis=(0, 2, 3))
-
-	# print 'total_deltas_per_layer', total_deltas_per_layer
 	delta = delta.transpose(1,2,3,0).reshape(K,-1)
 	dw = delta.dot(X_col.T).reshape(W.shape)
 	K, D, F, F = W.shape
@@ -20,15 +18,15 @@ def bp_conv(delta, cache):
 def bp_fc(delta, cache):
 	W, h = cache
 	N = h.shape[0]
-	h_temp = h.reshape(N,-1)
-	dW = np.dot(h_temp.T, delta)
+	h_r = h.reshape(N,-1)
+	dW = np.dot(h_r.T, delta)
 	db = np.sum(delta, axis=0)
 	dX = np.dot(delta, W.T).reshape(h.shape)
 	return dX, dW, db
 
 def bp_relu(delta, cache):
-	dX = delta 
-	dX[cache <= 0] = 0
+	if_gt = (cache > 0)
+	dX = delta * if_gt
 	return dX
 
 def bp_pool(delta, cache):
@@ -46,6 +44,6 @@ def bp_pool(delta, cache):
 	            for w in range(out_w):
 	                pool = X[n, d, h*S:h*S+F, w*S:w*S+F]
 	                pool_max = np.amax(pool)
-	                if_max = pool == pool_max
+	                if_max = (pool == pool_max)
 	                dx[n, d, h*S:h*S+F, w*S:w*S+F] += delta[n,d,h,w] * if_max
 	return dx
