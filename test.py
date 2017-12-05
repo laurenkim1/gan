@@ -8,6 +8,10 @@ from solver import *
 from model import *
 from gradient_check import *
 from mnist_loader import *
+from mnist_loader import *
+from sklearn import model_selection
+from sklearn.linear_model import LogisticRegression
+import pickle
 
 def rel_error(x, y):
 	""" returns relative error """
@@ -57,7 +61,9 @@ small_data = {
   'y_val': data['y_val'][:50],
 }
 
-model = discriminator(weight_scale=0.001, hidden_dim=500, reg=0.001)
+#savefile = open('mymodel.pkl', 'rb')
+#model = pickle.load(savefile)
+model = CNN(weight_scale=0.001, hidden_dim=500, reg=0.001)
 
 solver = Solver(model, data,
                 num_epochs=1, batch_size=50,
@@ -67,4 +73,16 @@ solver = Solver(model, data,
                 },
                 verbose=True, print_every=20)
 solver.train()
-solver.predict(data['X_train'][0], data['y_train'][0])
+
+# pickle.dump(model, savefile)
+# savefile.close()
+#savefile.close()
+
+for image in range(len(data['X_train'])):
+  X, y_pred = solver.predict(data['X_train'][image], data['y_train'][image])
+  if y_pred == data['y_train'][image]:
+    plt.title('Label is {label}'.format(label=y_pred))
+    plt.imshow(X, cmap='gray')
+    plt.show()
+
+
