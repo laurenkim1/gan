@@ -14,7 +14,7 @@ def flatten_data(X):
 		res.append(np.ndarray.flatten(x[0]))
 	return np.array(res)
 
-RF = RFC(n_estimators = 40)
+RF = RFC(n_estimators = 10)
 RF.fit(flatten_data(X_train), y_train)
-print RF.score(flatten_data(X_test), y_test)
-
+print "Train accuracy: %f" % RF.score(flatten_data(X_train), y_train)
+print "Test accuracy: %f" % RF.score(flatten_data(X_test), y_test)

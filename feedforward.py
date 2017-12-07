@@ -67,3 +67,31 @@ def relu_forward(X):
     out = np.maximum(X, 0)
     cache = X
     return cache, out
+
+
+def bn_forward(X, gamma, beta, running_mean, running_var, momentum, is_testing = False):
+    if is_testing:
+        mu = running_mean
+        var = running_var
+    else:
+        mu = np.mean(X, axis = 0)
+        var = np.var(X, axis = 0)
+
+    eps = 1e-4*np.ones(var.shape)
+
+    X_norm = (X - mu) / np.sqrt(var + eps)
+    # print X_norm.shape, gamma.shape, beta.shape
+    X_out = gamma * X_norm + beta
+    
+    if not is_testing:
+        running_mean *= momentum
+        running_mean += (1 - momentum) * mu
+
+        running_var *= momentum
+        running_var += (1 - momentum) * var
+
+    cache = (gamma, beta, mu, var, eps, X_norm)
+
+    return cache, X_out, running_mean, running_var
+
+

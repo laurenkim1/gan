@@ -248,7 +248,7 @@ class Solver(object):
         num_train = self.X_train.shape[0]
         iterations_per_epoch = max(num_train / self.batch_size, 1)
         num_iterations = self.num_epochs * iterations_per_epoch
-
+        # print num_epochs, iterations_per_epoch, num_tr
         for t in xrange(num_iterations):
             self._step()
 
@@ -292,7 +292,7 @@ class Solver(object):
 
     def predict(self, X, y):
         X = X.reshape((1, 1, 28, 28))
-        scores = self.model.loss(X)
+        scores = self.model.loss(X, y = None, is_testing = True)
         y_pred = np.argmax(scores, axis=1)
         X = X.reshape((28,28))
         return X, y_pred

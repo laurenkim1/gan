@@ -53,17 +53,22 @@ for param_name in sorted(grads):
 
 data = load_data_wrapper()
 
-num_train = 100
+small_set_size = 5
 small_data = {
-  'X_train': data['X_train'][:num_train],
-  'y_train': data['y_train'][:num_train],
-  'X_val': data['X_val'][:50],
-  'y_val': data['y_val'][:50],
+  'X_train': data['X_train'][:small_set_size],
+  'y_train': data['y_train'][:small_set_size],
+  'X_val': data['X_val'][:small_set_size],
+  'y_val': data['y_val'][:small_set_size],
+  # 'X_test': data['X_test'][:small_set_size],
+  # 'y_test': data['y_test'][:small_set_size]
 }
-
-#savefile = open('mymodel.pkl', 'rb')
-#model = pickle.load(savefile)
+ 
+# savefile = open('mymodel.pkl', 'rb')
+# model = pickle.load(savefile)
 model = CNN(weight_scale=0.001, hidden_dim=500, reg=0.001)
+
+
+outfile = open('batchnorm_model#####', 'w')
 
 solver = Solver(model, data,
                 num_epochs=1, batch_size=50,
@@ -74,15 +79,28 @@ solver = Solver(model, data,
                 verbose=True, print_every=20)
 solver.train()
 
-# pickle.dump(model, savefile)
-# savefile.close()
-#savefile.close()
+pickle.dump(solver, outfile)
+outfile.close()
 
+train_count, train_total = 0.0, 0.0
 for image in range(len(data['X_train'])):
   X, y_pred = solver.predict(data['X_train'][image], data['y_train'][image])
   if y_pred == data['y_train'][image]:
-    plt.title('Label is {label}'.format(label=y_pred))
-    plt.imshow(X, cmap='gray')
-    plt.show()
+    train_count += 1
+    # plt.title('Label is {label}'.format(label=y_pred))
+    # plt.imshow(X, cmap='gray')
+    # plt.show()
+  train_total += 1
+
+print "Train Accuracy = %f" % (train_count / train_total)
+
+test_count, test_total = 0.0, 0.0
+for image in range(len(data['X_val'])):
+  X, y_pred = solver.predict(data['X_val'][image], data['y_val'][image])
+  if y_pred == data['y_val'][image]:
+    test_count += 1
+  test_total += 1
+
+print "Test Accuracy = %f" % (test_count / test_total)
 
 
