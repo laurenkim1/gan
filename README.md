@@ -1,2 +1,2 @@
 # Matt and Lauren's CS182 Final Project
-# CNNs on MNSIT
+# CNNs on MNIST
