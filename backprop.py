@@ -56,7 +56,7 @@ def bp_batchnorm(delta, cache):
 	N = float(delta.shape[0])
 
 	a1 = delta * gamma /np.sqrt(var + eps)
-	b11 = - np.sum(delta * gamma * mu, axis=0) / np.sqrt(var+eps) /(var + eps)
+	b11 = - np.sum(delta * gamma * mu, axis=0) /np.sqrt(var+eps) /(var + eps)
 	b12 = mu * np.ones(delta.shape) / N
 	a2 = b11 * b12
 

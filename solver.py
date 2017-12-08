@@ -199,6 +199,7 @@ class Solver(object):
         for p, w in self.model.params.iteritems():
             dw = grads[p]
             config = self.optim_configs[p]
+            # print p, dw.shape, w.shape
             next_w, next_config = self.update_rule(w, dw, config)
             self.model.params[p] = next_w
             self.optim_configs[p] = next_config
@@ -291,12 +292,21 @@ class Solver(object):
         self.model.params = self.best_params
 
     def predict(self, X, y):
+        
         X = X.reshape((1, 1, 28, 28))
         scores = self.model.loss(X, y = None, is_testing = True)
         y_pred = np.argmax(scores, axis=1)
         X = X.reshape((28,28))
         return X, y_pred
         """
+        scores = self.model.loss(X, is_testing = True)
+        y_pred = np.argmax(scores, axis=1)
+        print y_pred.shape
+        correct = 0
+        for y_true, y_hat in zip(y, y_pred):
+            correct += int(y_true == y_hat)
+        return correct
+        
         plt.title('Label is {label}'.format(label=y_pred))
         plt.imshow(X, cmap='gray')
         plt.show()
