@@ -13,14 +13,11 @@ from sklearn import model_selection
 from sklearn.linear_model import LogisticRegression
 import pickle
 
-def rel_error(x, y):
-	""" returns relative error """
-	return np.max(np.abs(x - y) / (np.maximum(1e-8, np.abs(x) + np.abs(y))))
-
 data = load_data_wrapper()
 
 savefile = open('mymodel.pkl', 'rb')
 model = pickle.load(savefile)
+model.batch_normalize=False
 
 solver = Solver(model, data,
                 num_epochs=1, batch_size=50,
