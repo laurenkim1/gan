@@ -61,9 +61,9 @@ small_data = {
   'y_val': data['y_val'][:50],
 }
 
-#savefile = open('mymodel.pkl', 'rb')
-#model = pickle.load(savefile)
-model = CNN(weight_scale=0.001, hidden_dim=500, reg=0.001)
+savefile = open('mymodel.pkl', 'rb')
+model = pickle.load(savefile)
+#model = CNN(weight_scale=0.001, hidden_dim=500, reg=0.001)
 
 solver = Solver(model, data,
                 num_epochs=1, batch_size=50,
@@ -72,11 +72,11 @@ solver = Solver(model, data,
                   'learning_rate': 1e-3,
                 },
                 verbose=True, print_every=20)
-solver.train()
+#solver.train()
 
 # pickle.dump(model, savefile)
 # savefile.close()
-#savefile.close()
+savefile.close()
 
 for image in range(len(data['X_train'])):
   X, y_pred = solver.predict(data['X_train'][image], data['y_train'][image])
