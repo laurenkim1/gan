@@ -47,3 +47,24 @@ def bp_pool(delta, cache):
 	                if_max = (pool == pool_max)
 	                dx[n, d, h*S:h*S+F, w*S:w*S+F] += delta[n,d,h,w] * if_max
 	return dx
+
+def bp_batchnorm(delta, cache):
+	gamma, beta, mu, var, eps, X_norm = cache
+
+	dbeta = np.sum(delta, axis = 0)
+	dgamma = np.sum(delta * X_norm, axis = 0)
+	N = float(delta.shape[0])
+
+	a1 = delta * gamma /np.sqrt(var + eps)
+	b11 = - np.sum(delta * gamma * mu, axis=0) /np.sqrt(var+eps) /(var + eps)
+	b12 = mu * np.ones(delta.shape) / N
+	a2 = b11 * b12
+
+	dmu = -1 * np.sum(a1 + a2, axis = 0)
+	dx = a1 + a2 + dmu / N * np.ones(delta.shape)
+
+	return dx, dgamma, dbeta
+
+
+
+
